@@ -5,7 +5,7 @@ from openai import OpenAI
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
 
 def extract_text(file):
     reader = PdfReader(file)
@@ -66,20 +66,20 @@ def index():
     error = None
 
     if request.method == "POST":
-        file = request.files["file"]
+        if "file" not in request.files:
+            error = "No file uploaded"
+        else:
+            file = request.files["file"]
 
-        try:
-            text = extract_text(file)
+            try:
+                text = extract_text(file)
 
-            if not text.strip():
-                error = "Could not extract text."
-            else:
-                result = summarize(text)
+                if not text.strip():
+                    error = "Could not extract text."
+                else:
+                    result = summarize(text)
 
-        except Exception as e:
-            error = str(e)
+            except Exception as e:
+                error = str(e)
 
     return render_template("index.html", result=result, error=error)
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
