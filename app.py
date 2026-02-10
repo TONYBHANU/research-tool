@@ -7,6 +7,10 @@ client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 app = Flask(__name__)
 
+@app.route("/")
+def home():
+    return "Research Tool is running!"
+
 def extract_text(file):
     reader = PdfReader(file)
     text = ""
